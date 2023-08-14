@@ -2,6 +2,7 @@
 
 require_relative "minwise/version"
 require_relative "minwise/minwise"
+require_relative "minwise/minhash"
 
 module Minwise
   class Error < StandardError; end

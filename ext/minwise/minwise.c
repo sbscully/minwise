@@ -1,9 +1,74 @@
+#include <stdint.h>
 #include "minwise.h"
 
-VALUE rb_mMinwise;
+static VALUE mMinwise;
+static VALUE cMinwiseMinhash;
+
+static uint64_t randr(uint64_t min, uint64_t max, uint64_t seed) {
+  // xorshift*
+  uint64_t x = seed + 1; // must not be zero
+  x ^= x >> 12;
+  x ^= x << 25;
+  x ^= x >> 27;
+  x *= 0x2545F4914F6CDD1DULL;
+
+  return (uint64_t)(min + (double)x / UINT64_MAX * (max - min));
+}
+
+static void minhash(const uint32_t* set, const size_t set_len, uint32_t* hash, const size_t hash_len, uint64_t seed) {
+  const uint64_t p = 4294967311; // first prime greater than UINT32_MAX
+  uint64_t a, b;
+  uint32_t x, h;
+
+  for (size_t i = 0; i < hash_len; i++) {
+    a = randr(0, p, seed + i);
+    a = (a / 2) * 2 - 1; // must be odd
+    b = randr(0, p, a);
+
+    h = UINT32_MAX;
+    for (size_t j = 0; j < set_len; j++) {
+      x = (uint32_t)(((a * set[j] + b) % p) % UINT32_MAX);
+
+      if (x < h) {
+        h = x;
+      }
+    }
+
+    hash[i] = h;
+  }
+}
+
+static VALUE c_minhash(VALUE self, VALUE rb_set, VALUE rb_hash_len, VALUE rb_hash_seed) {
+  Check_Type(rb_set, T_ARRAY);
+
+  size_t rb_set_len = RARRAY_LEN(rb_set);
+  size_t c_hash_len = NUM2SIZET(rb_hash_len);
+  uint64_t c_hash_seed = NUM2ULONG(rb_hash_seed);
+
+  uint32_t *c_set = (uint32_t *)malloc(rb_set_len * sizeof(uint32_t));
+  for (size_t i = 0; i < rb_set_len; i++) {
+    c_set[i] = NUM2UINT(rb_ary_entry(rb_set, i));
+  }
+
+  uint32_t *c_hash = (uint32_t *)malloc(c_hash_len * sizeof(uint32_t));
+  minhash(c_set, rb_set_len, c_hash, c_hash_len, c_hash_seed);
+
+  VALUE rb_hash = rb_ary_new_capa(c_hash_len);
+  for (size_t i = 0; i < c_hash_len; i++) {
+    rb_ary_store(rb_hash, i, UINT2NUM(c_hash[i]));
+  }
+
+  free(c_set);
+  free(c_hash);
+
+  return rb_hash;
+}
 
 RUBY_FUNC_EXPORTED void
 Init_minwise(void)
 {
-  rb_mMinwise = rb_define_module("Minwise");
+  mMinwise = rb_define_module("Minwise");
+  cMinwiseMinhash = rb_define_class_under(mMinwise, "Minhash", rb_cObject);
+
+  rb_define_singleton_method(cMinwiseMinhash, "__hash", c_minhash, 3);
 }

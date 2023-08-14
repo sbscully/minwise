@@ -15,6 +15,7 @@ RuboCop::RakeTask.new
 
 require "rake/extensiontask"
 
+desc "Compile all the extensions"
 task build: :compile
 
 Rake::ExtensionTask.new("minwise") do |ext|
