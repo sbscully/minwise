@@ -1,16 +1,28 @@
 # frozen_string_literal: true
 
+require_relative '../preprocess'
+
 module Minwise
   class Minhash
-    DEFAULT_OPTIONS = { hash_size: 128, seed: 3_141_592 }.freeze
+    DEFAULT_OPTIONS = {
+      hash_size: 128,
+      shingle_size: 5,
+      seed: 3_141_592
+    }.freeze
 
     def self.digest(data, options = {})
       new(data, options).digest
     end
 
+    def self.batch(data, options = {})
+      data.map do |element|
+        digest(element, options)
+      end
+    end
+
     def initialize(data = [], options = {})
-      @data = Array(data)
       @options = DEFAULT_OPTIONS.merge(options)
+      @data = Preprocess.call(data, @options)
     end
 
     def update(element)
