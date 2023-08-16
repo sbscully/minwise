@@ -3,11 +3,6 @@
 require "test_helper"
 
 class TestMinhash < Minitest::Test
-  def read_test_data(filename)
-    path = File.expand_path("../data/#{filename}", File.dirname(__FILE__))
-    File.read(path).lines.map { |line| line.chomp.split(" ", 2) }
-  end
-
   def test_hash_is_array_of_integers
     minhash = Minwise::Minhash.digest([1, 2, 3])
 
