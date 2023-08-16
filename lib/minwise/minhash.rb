@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../preprocess'
+require_relative "../preprocess"
 
 module Minwise
   class Minhash
