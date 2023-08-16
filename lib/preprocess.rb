@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "digest"
+
 module Minwise
   class Preprocess
     def self.call(data, options)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "digest"
 
 class TestMinhash < Minitest::Test
   def read_test_data(filename)
@@ -29,6 +28,14 @@ class TestMinhash < Minitest::Test
 
     refute_equal(minhash_a, minhash_b)
     assert_in_delta(0.90, Minwise.similarity(minhash_a, minhash_b), 0.1)
+  end
+
+  def test_dissimilar_input_gives_dissimilar_hashes
+    minhash_a = Minwise::Minhash.digest("The quick brown fox jumped over the lazy dog")
+    minhash_b = Minwise::Minhash.digest("The five boxing wizards jump quickly")
+
+    refute_equal(minhash_a, minhash_b)
+    assert_in_delta(0.1, Minwise.similarity(minhash_a, minhash_b), 0.1)
   end
 
   def test_find_duplicates
