@@ -14,12 +14,6 @@ module Minwise
       new(data, options).digest
     end
 
-    def self.batch(data, options = {})
-      data.map do |element|
-        digest(element, options)
-      end
-    end
-
     def initialize(data = [], options = {})
       @options = DEFAULT_OPTIONS.merge(options)
       @data = Preprocess.call(data, @options)

@@ -31,7 +31,7 @@ module Minwise
 
     def tokenize(input)
       input.map do |element|
-        Digest::SHA1.hexdigest(element.to_str).to_i(16) % ((2**32) - 1)
+        Digest::MD5.hexdigest(element.to_str).to_i(16) % ((2**32) - 1)
       end
     end
   end
