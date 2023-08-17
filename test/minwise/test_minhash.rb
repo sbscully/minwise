@@ -40,10 +40,10 @@ class TestMinhash < Minitest::Test
     ids, texts = articles.transpose
     minhashes = ids.zip(texts.map { |text| Minwise::Minhash.digest(text) })
 
-    actual = minhashes.combination(2).filter_map do |(id_one, minhash_one), (id_two, minhash_two)|
+    duplicates = minhashes.combination(2).filter_map do |(id_one, minhash_one), (id_two, minhash_two)|
       [id_one, id_two] if Minwise.similarity(minhash_one, minhash_two) > 0.5
     end
 
-    assert_equal(expected.sort, actual.sort)
+    assert_equal(expected.sort, duplicates.sort)
   end
 end

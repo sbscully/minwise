@@ -22,4 +22,9 @@ Rake::ExtensionTask.new("minwise") do |ext|
   ext.lib_dir = "lib/minwise"
 end
 
+desc "Benchmark Minwise::Minhash.digest"
+task benchmark: :build do
+  ruby "./test/benchmark.rb"
+end
+
 task default: %i[clobber compile test rubocop]

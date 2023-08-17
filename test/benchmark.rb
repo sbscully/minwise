@@ -6,6 +6,8 @@ require "benchmark"
 
 require_relative "support/data_helper"
 
+puts "\n= Benchmark =\n"
+
 _, articles = read_test_data("articles_10000.train").transpose
 
 Benchmark.benchmark do |benchmark|
