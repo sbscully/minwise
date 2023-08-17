@@ -58,16 +58,20 @@ module Minwise
     end
 
     def digest
+      raise ArgumentError, "input must not be empty" if @data.empty?
+
       self.class.__hash(@data, @options[:hash_size], @options[:seed])
     end
 
     private
 
     def parse(data)
+      return [] if data.empty?
+
       if data.respond_to?(:to_a)
         data
       elsif data.respond_to?(:to_str)
-        self.class.__tokenize(data, @options[:shingle_size])
+        self.class.__tokenize(data.to_str, @options[:shingle_size])
       else
         raise ArgumentError, "input must be a string or array of integers"
       end

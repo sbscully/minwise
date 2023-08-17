@@ -81,6 +81,13 @@ static VALUE c_tokenize(VALUE self, VALUE rb_string, VALUE rb_shingle_size) {
   size_t c_string_len = RSTRING_LEN(rb_string);
   size_t c_shingle_size = NUM2SIZET(rb_shingle_size);
 
+  if (c_string_len <= c_shingle_size) {
+    VALUE rb_tokens = rb_ary_new_capa(1);
+    rb_ary_store(rb_tokens, 0, UINT2NUM(fnv1a(c_string)));
+
+    return rb_tokens;
+  }
+
   size_t rb_tokens_len = c_string_len - c_shingle_size + 1;
   VALUE rb_tokens = rb_ary_new_capa(rb_tokens_len);
 

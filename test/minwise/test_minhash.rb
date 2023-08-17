@@ -17,6 +17,26 @@ class TestMinhash < Minitest::Test
     assert_equal(minhash_a, minhash_b)
   end
 
+  def test_empty_input_throws_error
+    assert_raises(ArgumentError) do
+      Minwise::Minhash.digest("")
+    end
+
+    assert_raises(ArgumentError) do
+      Minwise::Minhash.digest([])
+    end
+  end
+
+  def test_hash_size_option
+    assert_equal(100, Minwise::Minhash.digest("The quick brown fox", hash_size: 100).length)
+  end
+
+  def test_shingle_size_larger_than_string
+    tokens = Minwise::Minhash.__tokenize("string", 10)
+
+    assert_equal(1, tokens.length)
+  end
+
   def test_similar_input_gives_similar_hashes
     minhash_a = Minwise::Minhash.digest("The quick brown fox jumped over the lazy dog")
     minhash_b = Minwise::Minhash.digest("he quick brown fox jumped over the lazy dog")
