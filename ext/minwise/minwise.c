@@ -1,19 +1,7 @@
-#include <stdint.h>
 #include "minwise.h"
 
 static VALUE mMinwise;
 static VALUE cMinwiseMinhash;
-
-static uint64_t randr(uint64_t min, uint64_t max, uint64_t seed) {
-  // xorshift*
-  uint64_t x = seed + 1; // must not be zero
-  x ^= x >> 12;
-  x ^= x << 25;
-  x ^= x >> 27;
-  x *= 0x2545F4914F6CDD1DULL;
-
-  return (uint64_t)(min + (double)x / UINT64_MAX * (max - min));
-}
 
 static void minhash(const uint32_t* set, const size_t set_len, uint32_t* hash, const size_t hash_len, uint64_t seed) {
   const uint64_t p = 4294967311; // first prime greater than UINT32_MAX
@@ -62,18 +50,6 @@ static VALUE c_minhash(VALUE self, VALUE rb_set, VALUE rb_hash_len, VALUE rb_has
   free(c_hash);
 
   return rb_hash;
-}
-
-static uint32_t fnv1a(char *str) {
-  uint32_t hash = 0x811c9dc5;
-  unsigned char *s = (unsigned char *)str;
-
-  while (*s) {
-    hash ^= (uint32_t)*s++;
-    hash *= 0x01000193;
-  }
-
-  return hash;
 }
 
 static VALUE c_tokenize(VALUE self, VALUE rb_string, VALUE rb_shingle_size) {
