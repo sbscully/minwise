@@ -8,7 +8,10 @@ require_relative "support/data_helper"
 
 puts "\n= Benchmark =\n"
 
-_, articles = read_test_data("articles_10000.train").transpose
+filename = "articles_10000.train"
+puts "Hash all articles in test/data/#{filename}\n\n"
+
+_, articles = read_test_data(filename).transpose
 
 Benchmark.benchmark do |benchmark|
   benchmark.report("Minwise::Minhash") do
